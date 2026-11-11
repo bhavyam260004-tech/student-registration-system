@@ -1,34 +1,58 @@
-"""Field validation for the Student Registration & Contact Intelligence System."""
+def validate_name(name):
+    if name.strip() == "":
+        return False, "Name is missing"
+    return True, "Valid"
 
-def validate_contact(name, phone, email):
-    """
-    Validate one contact.
 
-    Returns:
-        (True, "Valid") when all fields pass.
-        (False, reason) when the first validation rule fails.
-    """
-    name = str(name or "").strip()
-    phone = str(phone or "").strip()
-    email = str(email or "").strip()
+def validate_phone(phone):
+    phone = phone.strip()
 
-    if not name:
-        return False, "Name is blank"
+    if len(phone) != 10:
+        return False, "Phone number must contain 10 digits"
 
-    if len(phone) != 10 or not phone.isdigit():
-        return False, "Phone must contain exactly 10 digits"
-    if phone[0] not in "6789":
-        return False, "Phone must start with 6, 7, 8, or 9"
+    if not phone.isdigit():
+        return False, "Phone number must contain only digits"
+
+    if not phone.startswith(("6", "7", "8", "9")):
+        return False, "Phone number must start with 6, 7, 8 or 9"
+
+    return True, "Valid"
+
+
+def validate_email(email):
+    email = email.strip()
+
+    if " " in email:
+        return False, "Email must not contain spaces"
 
     if email.count("@") != 1:
         return False, "Email must contain exactly one @ symbol"
-    if any(char.isspace() for char in email):
-        return False, "Email must not contain whitespace"
 
     local, domain = email.split("@")
-    if not local:
-        return False, "Email must contain text before @"
-    if "." not in domain or domain.startswith(".") or domain.endswith("."):
-        return False, "Email domain must contain a valid period"
+
+    if local == "":
+        return False, "Email username is missing"
+
+    if "." not in domain:
+        return False, "Email domain must contain a dot"
+
+    if domain.startswith(".") or domain.endswith("."):
+        return False, "Invalid email domain"
 
     return True, "Valid"
+
+
+def validate_contact(name, phone, email):
+    valid, reason = validate_name(name)
+    if not valid:
+        return False, reason
+
+    valid, reason = validate_phone(phone)
+    if not valid:
+        return False, reason
+
+    valid, reason = validate_email(email)
+    if not valid:
+        return False, reason
+
+    return True, "Valid contact"
